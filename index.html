@@ -1,185 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Travel Weather — Live + Climate Fallback</title>
-  <style>
-    body{font-family:Inter,Arial,sans-serif;margin:24px;background:#f6f8fa;color:#0f172a}
-    h1{text-align:center;color:#0b5db6}
-    table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(12,22,37,0.06)}
-    th,td{padding:10px 12px;text-align:center;border-bottom:1px solid #eef2f7}
-    th{background:#0b5db6;color:#fff;font-weight:600}
-    tr:nth-child(even) td{background:#fbfdff}
-    .muted{color:#6b7280;font-style:italic}
-    .small{font-size:0.9rem}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spain & Morocco Weather Forecast</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; margin: 2rem; }
+  h1 { text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+  th, td { border: 1px solid #ccc; padding: 0.75rem; text-align: center; }
+  th { background: #e2e8f0; }
+  tr:nth-child(even) { background: #f1f5f9; }
+  .loading { text-align: center; margin-top: 2rem; }
+</style>
 </head>
 <body>
-  <h1>📅 Travel Weather — Live (when available) + Climate Averages</h1>
-  <p class="small muted">Temperatures are Fahrenheit. Live forecasts are used when available (Open-Meteo provides up to ~16 days). Otherwise the widget shows climate averages.</p>
-
-  <table aria-label="travel-weather">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Location</th>
-        <th>High (°F)</th>
-        <th>Low (°F)</th>
-        <th>Condition</th>
-        <th>Rain Chance</th>
-      </tr>
-    </thead>
-    <tbody id="tbody">
-      <!-- rows injected here -->
-    </tbody>
-  </table>
+<h1>Weather Forecast: Spain, Canary Islands & Morocco</h1>
+<div class="loading" id="loading">Loading latest forecasts...</div>
+<table id="weatherTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Date</th><th>Location</th><th>High (°F)</th><th>Low (°F)</th><th>Condition</th><th>Rain %</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
-/* ----------------------------
-   Travel plan (dates + coords)
-   ---------------------------- */
-const trips = [
-  { date: "2025-11-23", city: "Madrid, Spain", lat: 40.4168, lon: -3.7038 },
-  { date: "2025-11-24", city: "Madrid, Spain", lat: 40.4168, lon: -3.7038 },
-  { date: "2025-11-25", city: "Madrid, Spain", lat: 40.4168, lon: -3.7038 },
-  { date: "2025-11-26", city: "Madrid, Spain", lat: 40.4168, lon: -3.7038 },
-  { date: "2025-11-27", city: "Barcelona, Spain", lat: 41.3851, lon: 2.1734 },
-  { date: "2025-11-29", city: "Gibraltar", lat: 36.1408, lon: -5.3536 },
-  { date: "2025-12-01", city: "Lanzarote, Canary Islands", lat: 29.0469, lon: -13.5899 },
-  { date: "2025-12-02", city: "Tenerife, Canary Islands", lat: 28.2916, lon: -16.6291 },
-  { date: "2025-12-03", city: "Gran Canaria, Canary Islands", lat: 27.9202, lon: -15.5476 },
-  { date: "2025-12-05", city: "Casablanca, Morocco", lat: 33.5731, lon: -7.5898 },
-  { date: "2025-12-06", city: "Tangier, Morocco", lat: 35.7595, lon: -5.8340 },
-  { date: "2025-12-07", city: "Malaga, Spain", lat: 36.7213, lon: -4.4214 },
-  { date: "2025-12-09", city: "Barcelona, Spain", lat: 41.3851, lon: 2.1734 }
-];
-
-/* ----------------------------
-   Climate averages fallback
-   (approximate — used until live forecast is available)
-   ---------------------------- */
-const climateFallback = {
-  "Madrid, Spain": { high: 58, low: 42, cond: "Partly cloudy", rain: 20 },
-  "Barcelona, Spain": { high: 61, low: 47, cond: "Mild / partly cloudy", rain: 25 },
-  "Gibraltar": { high: 64, low: 55, cond: "Breezy / partly cloudy", rain: 20 },
-  "Lanzarote, Canary Islands": { high: 73, low: 63, cond: "Sunny", rain: 10 },
-  "Tenerife, Canary Islands": { high: 75, low: 64, cond: "Sunny", rain: 15 },
-  "Gran Canaria, Canary Islands": { high: 75, low: 65, cond: "Sunny", rain: 12 },
-  "Casablanca, Morocco": { high: 68, low: 53, cond: "Partly cloudy", rain: 20 },
-  "Tangier, Morocco": { high: 65, low: 52, cond: "Cloudy", rain: 25 },
-  "Malaga, Spain": { high: 64, low: 51, cond: "Mild / sunny", rain: 18 }
-};
-
-/* ----------------------------
-   Open-Meteo helpers
-   - Up to ~16-day forecast window (Open-Meteo docs)
-   - We'll request daily: max/min temps, precipitation_probability_max, weathercode
-   ---------------------------- */
-const weatherCodeMap = {
-  0:"Clear",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-  45:"Fog",48:"Depositing rime fog",51:"Light drizzle",53:"Moderate drizzle",
-  55:"Dense drizzle",61:"Slight rain",63:"Moderate rain",65:"Heavy rain",
-  80:"Rain showers",81:"Moderate rain showers",82:"Violent rain showers",
-  95:"Thunderstorm",96:"Thunderstorm with hail"
-};
-
-function withinForecastWindow(dateStr){
-  const today = new Date();
-  const d = new Date(dateStr + "T00:00:00");
-  const diffDays = Math.round((d - today)/(24*60*60*1000));
-  return diffDays >= 0 && diffDays <= 16; // Open-Meteo supports up to ~16 days
-}
-
-/* tiny fetch with timeout */
-function fetchWithTimeout(url, timeoutMs=8000){
-  return Promise.race([
-    fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error("Network error"))),
-    new Promise((_, rej) => setTimeout(()=>rej(new Error("Timeout")), timeoutMs))
-  ]);
-}
-
-/* Request forecast for a given lat/lon and single date */
-async function requestForecast(lat, lon, dateISO){
-  try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-                `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode` +
-                `&temperature_unit=fahrenheit&timezone=auto`;
-    const j = await fetchWithTimeout(url, 9000);
-    if(!j || !j.daily || !Array.isArray(j.daily.time)) return null;
-    const idx = j.daily.time.indexOf(dateISO);
-    if(idx === -1) return null;
-    return {
-      high: j.daily.temperature_2m_max[idx],
-      low: j.daily.temperature_2m_min[idx],
-      rain: j.daily.precipitation_probability_max ? j.daily.precipitation_probability_max[idx] : null,
-      cond: weatherCodeMap[j.daily.weathercode[idx]] || "N/A"
-    };
-  }catch(e){
-    // network error or timeout
-    return null;
-  }
-}
-
-/* ----------------------------
-   Rendering: show fallback immediately, then update if live data available
-   ---------------------------- */
-const tbody = document.getElementById('tbody');
-
-function formatDateShort(iso){
-  return new Date(iso + "T00:00:00").toLocaleDateString('en-US', {month:'short', day:'numeric'});
-}
-
-function renderRow(index, dataObj, isFallback=false){
-  // dataObj: {date, city, high, low, cond, rain}
-  const id = `row-${index}`;
-  let tr = document.getElementById(id);
-  const rainText = dataObj.rain != null ? `${dataObj.rain}%` : "—";
-  const highText = dataObj.high != null ? Math.round(dataObj.high) + "°" : "—";
-  const lowText = dataObj.low != null ? Math.round(dataObj.low) + "°" : "—";
-  const condText = dataObj.cond || "—";
-  const fallbackCls = isFallback ? 'muted' : '';
-  const html = `
-    <td>${formatDateShort(dataObj.date)}</td>
-    <td>${dataObj.city}</td>
-    <td class="${fallbackCls}">${highText}</td>
-    <td class="${fallbackCls}">${lowText}</td>
-    <td class="${fallbackCls}">${condText}</td>
-    <td class="${fallbackCls}">${rainText}</td>
-  `;
-  if(tr){
-    tr.innerHTML = html;
-  } else {
-    tr = document.createElement('tr');
-    tr.id = id;
-    tr.innerHTML = html;
-    tbody.appendChild(tr);
-  }
-}
-
-async function init(){
-  // Render fallback quickly for every row
-  trips.forEach((t,i) => {
-    const fallback = climateFallback[t.city] || {high: "—", low:"—", cond:"N/A", rain:"—"};
-    renderRow(i, {date: t.date, city: t.city, high: fallback.high, low: fallback.low, cond: fallback.cond, rain: fallback.rain}, true);
-  });
-
-  // Try to request live forecast per row if inside forecast window; update row if available.
-  for(const [i,t] of trips.entries()){
-    if(withinForecastWindow(t.date)){
-      const live = await requestForecast(t.lat, t.lon, t.date);
-      if(live){
-        renderRow(i, {date: t.date, city: t.city, high: live.high, low: live.low, cond: live.cond, rain: live.rain}, false);
-      }
-      // if live is null: leave fallback (already rendered)
-    }
-    // if not within window: leave fallback
-  }
-}
-
-// start
-init();
-
-</script>
-</body>
-</html>
+const locations = [
+  { name: "Madrid, Spain", lat: 40.4168, lon: -3.7038, dates: ["2025-11-23","2025-11-24","2025-11-25","2025-11-26"] },
+  { name: "Barcelona, Spain", lat: 41.3874, lon: 2.1686, dates: ["2025-11-27","2025-12-09"] },
+  { name: "Gibraltar", lat: 36.1408, lon: -5.3536, dates: ["2025-11-29"] },
+  { name
