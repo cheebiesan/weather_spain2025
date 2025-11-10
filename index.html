@@ -13,6 +13,7 @@
   tr:nth-child(even) { background: #f1f5f9; }
   .loading { text-align: center; margin-top: 2rem; font-size: 1.2rem; }
 </style>
+  <link rel="stylesheet" href="weather.css" />
 </head>
 <body>
 <h1>Weather Forecast: Europe 2025</h1>
@@ -74,32 +75,32 @@ function describeWeather(code) {
           <td>${loc.name}</td>
           <td>${Math.round(data.daily.temperature_2m_max[idx])}</td>
           <td>${Math.round(data.daily.temperature_2m_min[idx])}</td>
-          <td>${describeWeather(data.daily.weathercode[idx])}</td>
+          <td><span class="weather-icon condition-${describeWeather(data.daily.weathercode[idx]).replace(/\s/g, '\\:')}"></span><span>${describeWeather(data.daily.weathercode[idx])}</span></td>
           <td>${data.daily.precipitation_probability_max[idx]}%</td>
         `;
       } else {
         // fallback averages
-        const fallback = {
-          "Madrid, Spain": [58,42,20,"Partly cloudy"],
-          "Segovia, Spain": [55,39,25,"Partly cloudy"],
-          "Barcelona, Spain": [61,47,25,"Partly cloudy"],
-          "Gibraltar":[64,55,20,"Partly cloudy"],
-          "Lanzarote, Canary Islands":[73,63,10,"Sunny"],
-          "Tenerife, Canary Islands":[75,64,15,"Sunny"],
-          "Gran Canaria, Canary Islands":[75,65,12,"Sunny"],
-          "Casablanca, Morocco":[68,53,20,"Partly cloudy"],
-          "Tangier, Morocco":[65,52,25,"Cloudy"],
-          "Malaga, Spain":[64,51,18,"Partly sunny"]
-        };
-        const avg = fallback[loc.name] || [0,0,0,"N/A"];
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${loc.name}</td>
-          <td>${avg[0]}</td>
-          <td>${avg[1]}</td>
-          <td>${avg[3]}</td>
-          <td>${avg[2]}%</td>
-        `;
+const fallback = {
+  "Madrid, Spain": [58,42,20,"Partly cloudy"],
+  "Segovia, Spain": [55,39,25,"Partly cloudy"],
+  "Barcelona, Spain": [61,47,25,"Partly cloudy"],
+  "Gibraltar":[64,55,20,"Partly cloudy"],
+  "Lanzarote, Canary Islands":[73,63,10,"Sunny"],
+  "Tenerife, Canary Islands":[75,64,15,"Sunny"],
+  "Gran Canaria, Canary Islands":[75,65,12,"Sunny"],
+  "Casablanca, Morocco":[68,53,20,"Partly cloudy"],
+  "Tangier, Morocco":[65,52,25,"Cloudy"],
+  "Malaga, Spain":[64,51,18,"Partly sunny"]
+};
+const avg = fallback[loc.name] || [0,0,0,"N/A"];
+row.innerHTML = `
+  <td>${date}</td>
+  <td>${loc.name}</td>
+  <td>${avg[0]}</td>
+  <td>${avg[1]}</td>
+  <td><span class="weather-icon condition-${avg[3].replace(/\s/g, '\\:')}"></span><span>${avg[3]}</span></td>
+  <td>${avg[2]}%</td>
+`;
       }
       table.appendChild(row);
     });
