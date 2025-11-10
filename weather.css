@@ -1,0 +1,78 @@
+/* weather-icons.css
+   Styling and icon mapping for weather conditions
+   Works with <span class="weather-icon condition-Clear"></span>
+*/
+
+/* Basic icon appearance */
+.weather-icon {
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 1.4rem;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Clear or sunny */
+.condition-Clear::before,
+.condition-Sunny::before {
+  content: "☀️";
+}
+
+/* Mainly clear or partly cloudy */
+.condition-Mainly\:clear::before,
+.condition-Partly\:cloudy::before {
+  content: "🌤️";
+}
+
+/* Overcast or cloudy */
+.condition-Overcast::before,
+.condition-Cloudy::before {
+  content: "☁️";
+}
+
+/* Fog or mist */
+.condition-Foggy::before,
+.condition-Rime\:fog::before {
+  content: "🌫️";
+}
+
+/* Drizzle or light rain */
+.condition-Light\:drizzle::before {
+  content: "🌦️";
+}
+
+/* Regular rain */
+.condition-Rain::before,
+.condition-Showers::before {
+  content: "🌧️";
+}
+
+/* Heavy rain */
+.condition-Heavy\:rain::before {
+  content: "🌧️";
+  filter: brightness(0.8);
+}
+
+/* Snow */
+.condition-Snow::before {
+  content: "❄️";
+}
+
+/* Thunderstorm */
+.condition-Thunderstorm::before {
+  content: "⛈️";
+}
+
+/* Unknown or default */
+.condition-Unknown::before {
+  content: "❔";
+}
+
+/* Optional: color hints */
+td .weather-icon + span {
+  color: #333;
+}
+
+tr td {
+  font-size: 0.95rem;
+}
