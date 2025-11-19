@@ -13,102 +13,17 @@
   tr:nth-child(even) { background: #f1f5f9; }
   .loading { text-align: center; margin-top: 2rem; font-size: 1.2rem; }
 </style>
-  <link rel="stylesheet" href="weather.css" />
+<link rel="stylesheet" href="weather.css" />
 </head>
 <body>
+
 <h1>Weather Forecast: Europe 2025</h1>
 <div class="loading" id="loading">Loading latest forecasts...</div>
+
 <table id="weatherTable" style="display:none;">
   <thead>
     <tr>
       <th>Date</th><th>Location</th><th>High (°F)</th><th>Low (°F)</th><th>Condition</th><th>Rain %</th>
     </tr>
   </thead>
-  <tbody></tbody>
-</table>
-
-<script>
-const locations = [
-  { name: "Madrid, Spain", lat: 40.4168, lon: -3.7038, dates: ["2025-11-23","2025-11-24","2025-11-25","2025-11-26"] },
-  { name: "Segovia, Spain", lat: 40.9481, lon: -4.1184, dates: ["2025-11-25"] },
-  { name: "Barcelona, Spain", lat: 41.3874, lon: 2.1686, dates: ["2025-11-27"] },
-  { name: "Gibraltar", lat: 36.1408, lon: -5.3536, dates: ["2025-11-29"] },
-  { name: "Lanzarote, Canary Islands", lat: 29.0469, lon: -13.5899, dates: ["2025-12-01"] },
-  { name: "Tenerife, Canary Islands", lat: 28.2916, lon: -16.6291, dates: ["2025-12-02"] },
-  { name: "Gran Canaria, Canary Islands", lat: 27.9202, lon: -15.5476, dates: ["2025-12-03"] },
-  { name: "Casablanca, Morocco", lat: 33.5731, lon: -7.5898, dates: ["2025-12-05"] },
-  { name: "Tangier, Morocco", lat: 35.7595, lon: -5.8340, dates: ["2025-12-06"] },
-  { name: "Malaga, Spain", lat: 36.7213, lon: -4.4214, dates: ["2025-12-07"] },
-  { name: "Barcelona, Spain", lat: 41.3874, lon: 2.1686, dates: ["2025-12-09"] },
-];
-
-async function fetchWeather(lat, lon) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&forecast_days=16&timezone=auto`;
-  const res = await fetch(url);
-  return res.json();
-}
-
-function describeWeather(code) {
-  const codes = {
-    0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-    45: "Foggy", 48: "Rime fog", 51: "Light drizzle", 61: "Rain",
-    63: "Heavy rain", 71: "Snow", 80: "Rain showers", 95: "Thunderstorm"
-  };
-  return codes[code] || "Unknown";
-}
-
-(async () => {
-  const table = document.querySelector("#weatherTable tbody");
-  for (const loc of locations) {
-    let data;
-    try {
-      data = await fetchWeather(loc.lat, loc.lon);
-    } catch(e) {
-      console.warn("Live fetch failed, using fallback:", loc.name);
-      data = { daily: { time: [], temperature_2m_max: [], temperature_2m_min: [], precipitation_probability_max: [], weathercode: [] } };
-    }
-    loc.dates.forEach(date => {
-      const idx = data.daily.time.indexOf(date);
-      const row = document.createElement("tr");
-      if (idx !== -1) {
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${loc.name}</td>
-          <td>${Math.round(data.daily.temperature_2m_max[idx])}</td>
-          <td>${Math.round(data.daily.temperature_2m_min[idx])}</td>
-          <td><span class="weather-icon condition-${describeWeather(data.daily.weathercode[idx]).replace(/\s/g, '\\:')}"></span><span>${describeWeather(data.daily.weathercode[idx])}</span></td>
-          <td>${data.daily.precipitation_probability_max[idx]}%</td>
-        `;
-      } else {
-        // fallback averages
-const fallback = {
-  "Madrid, Spain": [58,42,20,"Partly cloudy"],
-  "Segovia, Spain": [55,39,25,"Partly cloudy"],
-  "Barcelona, Spain": [61,47,25,"Partly cloudy"],
-  "Gibraltar":[64,55,20,"Partly cloudy"],
-  "Lanzarote, Canary Islands":[73,63,10,"Sunny"],
-  "Tenerife, Canary Islands":[75,64,15,"Sunny"],
-  "Gran Canaria, Canary Islands":[75,65,12,"Sunny"],
-  "Casablanca, Morocco":[68,53,20,"Partly cloudy"],
-  "Tangier, Morocco":[65,52,25,"Cloudy"],
-  "Malaga, Spain":[64,51,18,"Partly sunny"]
-};
-const avg = fallback[loc.name] || [0,0,0,"N/A"];
-row.innerHTML = `
-  <td>${date}</td>
-  <td>${loc.name}</td>
-  <td>${avg[0]}</td>
-  <td>${avg[1]}</td>
-  <td><span class="weather-icon condition-${avg[3].replace(/\s/g, '\\:')}"></span><span>${avg[3]}</span></td>
-  <td>${avg[2]}%</td>
-`;
-      }
-      table.appendChild(row);
-    });
-  }
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("weatherTable").style.display = "table";
-})();
-</script>
-</body>
-</html>
+  <tbody></tbod
