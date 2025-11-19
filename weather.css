@@ -1,59 +1,104 @@
-/* Overall page */
-body {
-    font-family: Arial, sans-serif;
-    background: #f7f7f7;
-    padding: 20px;
-    margin: 0;
+/* ============================================================
+   WEATHER WIDGET STYLES — TABLE + WEATHER ICONS
+   ============================================================ */
+
+/* --- Table Layout --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.95rem;
 }
 
-/* Loading text */
-#loading {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
 }
 
-/* Each day block */
-.day-block {
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    position: relative;
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
 
-/* Title inside each block */
-.day-block strong {
-    font-size: 16px;
-    color: #333;
+tr:nth-child(even) {
+  background-color: #fafafa;
 }
 
-/* Weather icon placement */
+/* --- Weather Icon Appearance --- */
 .weather-icon {
-    width: 42px;
-    height: 42px;
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    opacity: 0.9;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 1.4rem;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
-/* Temperature styling */
-.temperature {
-    font-size: 15px;
-    margin: 4px 0;
+/* ============================================================
+   WEATHER CONDITION → EMOJI MAPPING
+   ALL CLASSES USE DASHES INSTEAD OF SPECIAL CHARACTERS
+   (matches the sanitized JS version)
+   ============================================================ */
+
+/* Clear / sunny */
+.condition-Clear::before,
+.condition-Sunny::before {
+  content: "☀️";
 }
 
-/* Rain probability */
-.rain {
-    font-size: 14px;
-    color: #1e73be;
-    margin: 3px 0;
+/* Partly cloudy / mainly clear */
+.condition-Mainly-clear::before,
+.condition-Partly-cloudy::before {
+  content: "🌤️";
 }
 
-/* Error blocks */
-.error {
-    color: red;
-    font-size: 14px;
+/* Cloudy / overcast */
+.condition-Overcast::before,
+.condition-Cloudy::before {
+  content: "☁️";
+}
+
+/* Fog / mist */
+.condition-Fog::before,
+.condition-Mist::before,
+.condition-Foggy::before {
+  content: "🌫️";
+}
+
+/* Light drizzle */
+.condition-Light-drizzle::before {
+  content: "🌦️";
+}
+
+/* Regular rain */
+.condition-Rain::before,
+.condition-Showers::before {
+  content: "🌧️";
+}
+
+/* Heavy rain */
+.condition-Heavy-rain::before {
+  content: "🌧️";
+  filter: brightness(0.8);
+}
+
+/* Snow */
+.condition-Snow::before {
+  content: "❄️";
+}
+
+/* Thunderstorm */
+.condition-Thunderstorm::before {
+  content: "⛈️";
+}
+
+/* Unknown / fallback */
+.condition-Unknown::before {
+  content: "❔";
+}
+
+/* Optional subtle text styling */
+td .weather-icon + span {
+  color: #333;
 }
