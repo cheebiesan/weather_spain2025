@@ -1,78 +1,59 @@
-/* weather-icons.css
-   Styling and icon mapping for weather conditions
-   Works with <span class="weather-icon condition-Clear"></span>
-*/
+/* Overall page */
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    padding: 20px;
+    margin: 0;
+}
 
-/* Basic icon appearance */
+/* Loading text */
+#loading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Each day block */
+.day-block {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+/* Title inside each block */
+.day-block strong {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Weather icon placement */
 .weather-icon {
-  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-  font-size: 1.4rem;
-  display: inline-block;
-  margin-right: 6px;
-  vertical-align: middle;
+    width: 42px;
+    height: 42px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    opacity: 0.9;
 }
 
-/* Clear or sunny */
-.condition-Clear::before,
-.condition-Sunny::before {
-  content: "☀️";
+/* Temperature styling */
+.temperature {
+    font-size: 15px;
+    margin: 4px 0;
 }
 
-/* Mainly clear or partly cloudy */
-.condition-Mainly\:clear::before,
-.condition-Partly\:cloudy::before {
-  content: "🌤️";
+/* Rain probability */
+.rain {
+    font-size: 14px;
+    color: #1e73be;
+    margin: 3px 0;
 }
 
-/* Overcast or cloudy */
-.condition-Overcast::before,
-.condition-Cloudy::before {
-  content: "☁️";
-}
-
-/* Fog or mist */
-.condition-Foggy::before,
-.condition-Rime\:fog::before {
-  content: "🌫️";
-}
-
-/* Drizzle or light rain */
-.condition-Light\:drizzle::before {
-  content: "🌦️";
-}
-
-/* Regular rain */
-.condition-Rain::before,
-.condition-Showers::before {
-  content: "🌧️";
-}
-
-/* Heavy rain */
-.condition-Heavy\:rain::before {
-  content: "🌧️";
-  filter: brightness(0.8);
-}
-
-/* Snow */
-.condition-Snow::before {
-  content: "❄️";
-}
-
-/* Thunderstorm */
-.condition-Thunderstorm::before {
-  content: "⛈️";
-}
-
-/* Unknown or default */
-.condition-Unknown::before {
-  content: "❔";
-}
-
-/* Optional: color hints */
-td .weather-icon + span {
-  color: #333;
-}
-
-tr td {
-  font-size: 0.95rem;
+/* Error blocks */
+.error {
+    color: red;
+    font-size: 14px;
 }
